@@ -1,0 +1,39 @@
+{% extends 'teams/base.html' %}
+{% block body %}
+<div class="container">
+    <br>
+    <br>
+    <h1>The League Teams are:</h1>
+    <br>
+    {% for groups in list_of_groups %}
+    <div class="row">
+        {% for group in groups %}
+        <div class="col-md-3 mb-3 mb-md-0">
+            <div class="card py-4 h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        {% for title in group.keys %}
+                        {{ title }}
+                        {% endfor %}
+                    </h5>
+                    <p class="card-text">
+                        {% for clubs in group.values %}
+                        {% for club in clubs %}
+                        {{ club.name }}
+                        <br>
+                        {% endfor %}
+                        {% endfor %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    {% endfor %}
+</div>
+{% endblock %}

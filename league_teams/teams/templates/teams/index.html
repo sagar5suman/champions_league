@@ -1,0 +1,15 @@
+{% extends 'teams/base.html' %}
+{% block body %}
+<div class="container">
+    <br>
+    <br>
+    <h1>Welcome to Champions League!!!</h1>
+    <br>
+    <h2>The Clubs are:</h2>
+    <ul>
+        {% for club in clubs %}
+        <li>{{ club.name }} ({{ club.state }})</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
