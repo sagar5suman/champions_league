@@ -8,7 +8,11 @@
     <h2>The Clubs are:</h2>
     <ul>
         {% for club in clubs %}
+        {% if club.is_super_qualifier %}
+        <li style="color: red;">{{ club.name }} ({{ club.state }})</li>
+        {% else %}
         <li>{{ club.name }} ({{ club.state }})</li>
+        {% endif %}
         {% endfor %}
     </ul>
 </div>

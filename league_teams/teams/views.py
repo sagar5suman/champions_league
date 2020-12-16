@@ -2,108 +2,58 @@ from django.shortcuts import render
 from .models import Club
 from random import sample
 
+def create_models_and_save_data_in_db():
+    qualifiers = {
+        'Striking Sharpshooters': {'state': 'Delhi', 'is_super_qualifier': True},
+        'Blue Bombers': {'state': 'Haryana', 'is_super_qualifier': True},
+        'Blue Geckos': {'state': 'Madhya Pradesh', 'is_super_qualifier': True},
+        'Midnight Miners': {'state': 'Uttar Pradesh', 'is_super_qualifier': True},
+        'Alpha Blockers': {'state': 'Rajasthan', 'is_super_qualifier': True},
+        'Tornado Geckos': {'state': 'Punjab', 'is_super_qualifier': True},
+        'Muffin Racers': {'state': 'Maharashtra', 'is_super_qualifier': True},
+        'Black & White Gangstaz': {'state': 'Andra Pradesh', 'is_super_qualifier': True},
+        'Rhino Hurricanes': {'state': 'Uttar Pradesh', 'is_super_qualifier': False},
+        'Midnight Stars': {'state': 'J&K', 'is_super_qualifier': False},
+        'Rocky Assassins': {'state': 'Delhi', 'is_super_qualifier': False},
+        'Skull Fireballs': {'state': 'Goa', 'is_super_qualifier': False},
+        'Spirit Blockers': {'state': 'Andra Pradesh', 'is_super_qualifier': False},
+        'Wind Kamikaze Pilots': {'state': 'Kerala', 'is_super_qualifier': False},
+        'Retro Chuckers': {'state': 'Uttarakhand', 'is_super_qualifier': False},
+        'Venomous Cyborgs': {'state': 'West Bengal', 'is_super_qualifier': False},
+        'Quicksilver Ninjas': {'state': 'Sikkim', 'is_super_qualifier': False},
+        'Retro Heroes': {'state': 'Haryana', 'is_super_qualifier': False},
+        'Lions': {'state': 'Punjab', 'is_super_qualifier': False},
+        'Raging Spanners': {'state': 'Himachal Pradesh', 'is_super_qualifier': False},
+        'Poison Spiders': {'state': 'Odisha', 'is_super_qualifier': False},
+        'Black Bullets': {'state': 'Uttar Pradesh', 'is_super_qualifier': False},
+        'Thunder Commandos': {'state': 'Uttar Pradesh', 'is_super_qualifier': False},
+        'Venomous Sharks': {'state': 'Haryana', 'is_super_qualifier': False},
+        'Killer Stars': {'state': 'Nagaland', 'is_super_qualifier': False},
+        'Knockout Busters': {'state': 'Madhya Pradesh', 'is_super_qualifier': False},
+        'Real Madrid': {'state': 'Delhi', 'is_super_qualifier': False},
+        'Demolition Piledrivers': {'state': 'Rajasthan', 'is_super_qualifier': False},
+        'Flying Xpress': {'state': 'Delhi', 'is_super_qualifier': False},
+        'Silver Wasps': {'state': 'Uttarakhand', 'is_super_qualifier': False},
+        'The Showstoppers': {'state': 'Delhi', 'is_super_qualifier': False},
+        'Wolfsburg': {'state': 'Haryana', 'is_super_qualifier': False},
+    }
+
+    for k, v in qualifiers.items():
+        club = Club(name=k, state=v.get('state'), is_super_qualifier=v.get('is_super_qualifier'))
+        club.save()
+
 # Create your views here.
 def index(request):
     clubs = Club.objects.all()
-    if clubs.count() != 0:
-        clubs.delete()
-    
-    super_qualifiers = {
-        'Striking Sharpshooters': 'Delhi',
-        'Blue Bombers': 'Haryana',
-        'Blue Geckos': 'Madhya Pradesh',
-        'Midnight Miners': 'Uttar Pradesh',
-        'Alpha Blockers': 'Rajasthan',
-        'Tornado Geckos': 'Punjab',
-        'Muffin Racers': 'Maharashtra',
-        'Black & White Gangstaz': 'Andra Pradesh',
-    }
-    
-    qualifiers = {
-        'Rhino Hurricanes': 'Uttar Pradesh',
-        'Midnight Stars': 'J&K',
-        'Rocky Assassins': 'Delhi',
-        'Skull Fireballs': 'Goa',
-        'Spirit Blockers': 'Andra Pradesh',
-        'Wind Kamikaze Pilots': 'Kerala',
-        'Retro Chuckers': 'Uttarakhand',
-        'Venomous Cyborgs': 'West Bengal',
-        'Quicksilver Ninjas': 'Sikkim',
-        'Retro Heroes': 'Haryana',
-        'Lions': 'Punjab',
-        'Raging Spanners': 'Himachal Pradesh',
-        'Poison Spiders': 'Odisha',
-        'Black Bullets': 'Uttar Pradesh',
-        'Thunder Commandos': 'Uttar Pradesh',
-        'Venomous Sharks': 'Haryana',
-        'Killer Stars': 'Nagaland',
-        'Knockout Busters': 'Madhya Pradesh',
-        'Real Madrid': 'Delhi',
-        'Demolition Piledrivers': 'Rajasthan',
-        'Flying Xpress': 'Delhi',
-        'Silver Wasps': 'Uttarakhand',
-        'The Showstoppers': 'Delhi',
-        'Wolfsburg': 'Haryana',
-    }
+    if clubs.count() == 0:
+        create_models_and_save_data_in_db()
 
-    for k, v in super_qualifiers.items():
-        club = Club(name=k, state=v, is_super_qualifier=True)
-        club.save()
-    
-    for k, v in qualifiers.items():
-        club = Club(name=k, state=v)
-        club.save()
-    
-    return render(request, 'teams/index.html', {'clubs': Club.objects.all()})
+    return render(request, 'teams/index.html', {'clubs': sample(set(Club.objects.all()), 32)})
 
 def teams(request):
     clubs = Club.objects.all()
     if clubs.count() == 0:
-        super_qualifiers = {
-            'Striking Sharpshooters': 'Delhi',
-            'Blue Bombers': 'Haryana',
-            'Blue Geckos': 'Madhya Pradesh',
-            'Midnight Miners': 'Uttar Pradesh',
-            'Alpha Blockers': 'Rajasthan',
-            'Tornado Geckos': 'Punjab',
-            'Muffin Racers': 'Maharashtra',
-            'Black & White Gangstaz': 'Andra Pradesh',
-        }
-        
-        qualifiers = {
-            'Rhino Hurricanes': 'Uttar Pradesh',
-            'Midnight Stars': 'J&K',
-            'Rocky Assassins': 'Delhi',
-            'Skull Fireballs': 'Goa',
-            'Spirit Blockers': 'Andra Pradesh',
-            'Wind Kamikaze Pilots': 'Kerala',
-            'Retro Chuckers': 'Uttarakhand',
-            'Venomous Cyborgs': 'West Bengal',
-            'Quicksilver Ninjas': 'Sikkim',
-            'Retro Heroes': 'Haryana',
-            'Lions': 'Punjab',
-            'Raging Spanners': 'Himachal Pradesh',
-            'Poison Spiders': 'Odisha',
-            'Black Bullets': 'Uttar Pradesh',
-            'Thunder Commandos': 'Uttar Pradesh',
-            'Venomous Sharks': 'Haryana',
-            'Killer Stars': 'Nagaland',
-            'Knockout Busters': 'Madhya Pradesh',
-            'Real Madrid': 'Delhi',
-            'Demolition Piledrivers': 'Rajasthan',
-            'Flying Xpress': 'Delhi',
-            'Silver Wasps': 'Uttarakhand',
-            'The Showstoppers': 'Delhi',
-            'Wolfsburg': 'Haryana',
-        }
-
-        for k, v in super_qualifiers.items():
-            club = Club(name=k, state=v, is_super_qualifier=True)
-            club.save()
-        
-        for k, v in qualifiers.items():
-            club = Club(name=k, state=v)
-            club.save()
+        create_models_and_save_data_in_db()
 
     super_qualifiers = sample(set(Club.objects.filter(is_super_qualifier=True)), 8)
     group_a = [super_qualifiers[0]]
