@@ -37,46 +37,51 @@ def create_models_and_save_data_in_db():
         'The Showstoppers': {'state': 'Delhi', 'is_super_qualifier': False},
         'Wolfsburg': {'state': 'Haryana', 'is_super_qualifier': False},
     }
-
+    
+    clubs = set()
+    
     for k, v in qualifiers.items():
         club = Club(name=k, state=v.get('state'), is_super_qualifier=v.get('is_super_qualifier'))
         club.save()
+        clubs.add(club)
+
+    return clubs
 
 # Create your views here.
 def index(request):
-    clubs = Club.objects.all()
-    if clubs.count() == 0:
-        create_models_and_save_data_in_db()
-
-    return render(request, 'teams/index.html', {'clubs': sample(set(Club.objects.all()), 32)})
+    clubs = Club.objects.filter(group='Unknown')
+    if clubs.count() != 32:
+        clubs.delete()
+        clubs = create_models_and_save_data_in_db()
+    return render(request, 'teams/index.html', {'clubs': sample(set(clubs), 32)})
 
 def teams(request):
-    clubs = Club.objects.all()
-    if clubs.count() == 0:
+    clubs = Club.objects.filter(group='Unknown')
+    if clubs.count() != 32:
+        clubs.delete()
         create_models_and_save_data_in_db()
 
-    super_qualifiers = sample(set(Club.objects.filter(is_super_qualifier=True)), 8)
-    group_a = [super_qualifiers[0]]
-    group_b = [super_qualifiers[1]]
-    group_c = [super_qualifiers[2]]
-    group_d = [super_qualifiers[3]]
-    group_e = [super_qualifiers[4]]
-    group_f = [super_qualifiers[5]]
-    group_g = [super_qualifiers[6]]
-    group_h = [super_qualifiers[7]]
+    super_qualifiers = sample(set(Club.objects.filter(is_super_qualifier=True, group='Unknown')), 8)
+    grp = {}
+    for i, j in enumerate(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']):
+        super_qualifiers[i].group = f'GROUP {j}'
+        grp[f'GROUP {j}'] = [super_qualifiers[i]]
+        super_qualifiers[i].save()
 
-    qualifiers = sample(set(Club.objects.filter(is_super_qualifier=False)), 24)
+    qualifiers = sample(set(Club.objects.filter(is_super_qualifier=False, group='Unknown')), 24)
     while qualifiers != []:
-        for group in group_a, group_b, group_c, group_d, group_e, group_f, group_g, group_h:
+        for k, v in grp.items():
             for qualifier in qualifiers:
-                if all(qualifier.state != c.state for c in group) and len(group) < 4:
-                    group.append(qualifier)
+                if all(qualifier.state != c.state for c in v) and len(v) < 4:
+                    qualifier.group = k
+                    v.append(qualifier)
                     qualifiers.remove(qualifier)
-                if len(group) == 4:
+                    qualifier.save()
+                if len(v) == 4:
                     break
-
+    
     list_of_groups = [
-        [{'GROUP A': group_a}, {'GROUP B': group_b}, {'GROUP C': group_c}, {'GROUP D': group_d}],
-        [{'GROUP E': group_e}, {'GROUP F': group_f}, {'GROUP G': group_g}, {'GROUP H': group_h}],
+        [{'GROUP A': grp.get('GROUP A')}, {'GROUP B': grp.get('GROUP B')}, {'GROUP C': grp.get('GROUP C')}, {'GROUP D': grp.get('GROUP D')}],
+        [{'GROUP E': grp.get('GROUP E')}, {'GROUP F': grp.get('GROUP F')}, {'GROUP G': grp.get('GROUP G')}, {'GROUP H': grp.get('GROUP H')}],
     ]
     return render(request, 'teams/teams.html', {'list_of_groups': list_of_groups})
